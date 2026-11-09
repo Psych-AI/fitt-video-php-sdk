@@ -1,0 +1,6 @@
+{
+    "secret": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV",
+    "timestamp": "1794218400",
+    "body": "{\"id\":\"01kfy0a2b3c4d5e6f7g8h9j0km\",\"type\":\"session.discarded\",\"sequence\":1}",
+    "signature": "sha256=fdfd013f668834519f82f7d798890b6336c5a8a81ed9af12f8a04e0e4c8bd0ec"
+}
