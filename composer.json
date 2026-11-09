@@ -1,0 +1,37 @@
+{
+    "name": "fitt/video-sdk",
+    "description": "The PHP SDK for Fitt Video: sessions, recipes, results and signed webhooks.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.4",
+        "ext-json": "*",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.1 || ^2.0"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "The PSR-18 client built when none is passed (^7.8 || ^8.0)."
+    },
+    "autoload": {
+        "psr-4": {
+            "Fitt\\Video\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Fitt\\Video\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fitt\\Video\\Laravel\\FittVideoServiceProvider"
+            ],
+            "aliases": {
+                "FittVideo": "Fitt\\Video\\Laravel\\FittVideo"
+            }
+        }
+    },
+    "minimum-stability": "stable"
+}
