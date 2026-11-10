@@ -27,7 +27,12 @@ $created = FittVideo::createSession(Recipe::answer()->question('Tell us about a 
 $descriptor = $created['descriptor']; // send only this to the browser
 
 Route::post('fitt/webhook', function (Illuminate\Http\Request $request) {
-    $event = FittVideo::verifyWebhook($request); // throws InvalidWebhookSignature
+    try {
+        $event = FittVideo::verifyWebhook($request);
+    } catch (Fitt\Video\Exceptions\InvalidWebhookSignature) {
+        return response()->noContent(401);
+    }
+
     HandleFittEvent::dispatch($event->type, $event->id, $event->data);
 
     return response()->noContent();

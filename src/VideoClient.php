@@ -279,10 +279,9 @@ class VideoClient
     }
 
     /**
-     * @return array<mixed>
-     */
-    /**
      * The decoded body: `[]` for an empty one.
+     *
+     * @return array<mixed>
      *
      * @throws ApiException `invalid_response` for a body that is not a JSON object or list
      */

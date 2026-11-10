@@ -88,7 +88,7 @@ Route::post('fitt/webhook', function (Request $request) {
     HandleFittEvent::dispatch($event->type, $event->id, $event->data); // queue the work
 
     return response()->noContent(); // answer 2xx fast
-});
+})->name('fitt.webhook');
 ```
 
 - **Verify on the raw body.** Any re-encoding breaks the signature. Outside
