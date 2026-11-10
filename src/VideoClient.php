@@ -22,8 +22,9 @@ use Psr\Http\Message\StreamFactoryInterface;
  * builds Guzzle when Guzzle is installed.
  *
  * Every method answers the decoded JSON body unless its docblock says otherwise,
- * and throws an `ApiException` subclass for a status of 400 or more, or a
- * `TransportException` when no answer came. `frameUrl()` is the API URL, which
+ * and throws an `ApiException` subclass for a status of 400 or more, an
+ * `ApiException` with `errorCode` `invalid_response` for a body that is not a
+ * JSON object or list, or a `TransportException` when no answer came. `frameUrl()` is the API URL, which
  * needs the API key: it is for server use, never for a browser.
  */
 class VideoClient
@@ -280,11 +281,37 @@ class VideoClient
     /**
      * @return array<mixed>
      */
+    /**
+     * The decoded body: `[]` for an empty one.
+     *
+     * @throws ApiException `invalid_response` for a body that is not a JSON object or list
+     */
     private function json(ResponseInterface $response): array
     {
         $body = (string) $response->getBody();
 
-        return $body === '' ? [] : json_decode($body, true, flags: JSON_THROW_ON_ERROR);
+        if ($body === '') {
+            return [];
+        }
+
+        try {
+            $decoded = json_decode($body, true, flags: JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw self::invalidResponse($response, $e);
+        }
+
+        if (! is_array($decoded)) {
+            throw self::invalidResponse($response);
+        }
+
+        return $decoded;
+    }
+
+    private static function invalidResponse(ResponseInterface $response, ?\Throwable $previous = null): ApiException
+    {
+        $status = $response->getStatusCode();
+
+        return new ApiException("The API answered {$status} with a body that is not a JSON object.", $status, 'invalid_response', previous: $previous);
     }
 
     private static function defaultClient(): ClientInterface

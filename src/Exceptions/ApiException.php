@@ -5,9 +5,11 @@ namespace Fitt\Video\Exceptions;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * The API answered a status of 400 or more. `$errorCode` is the envelope's
- * `error.code` (`http_error` when the body carries no envelope), `$status` the
- * HTTP status and `$fields` the envelope's `error.fields`, when given.
+ * The API answered a status of 400 or more, or a body that is not a JSON
+ * object or list (`invalid_response`, with the status it came with).
+ * `$errorCode` is the envelope's `error.code` (`http_error` when the body
+ * carries no envelope), `$status` the HTTP status and `$fields` the envelope's
+ * `error.fields`, when given.
  */
 class ApiException extends FittVideoException
 {

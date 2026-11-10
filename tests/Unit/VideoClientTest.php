@@ -194,3 +194,13 @@ test('an empty body is sent as an object, a take rides on an analysis request, a
         ->and($http->requests[2]->hasHeader('Content-Type'))->toBeFalse()
         ->and((string) $http->requests[2]->getBody())->toBe('');
 });
+
+test('a body that is JSON but not an object or a list is an invalid_response, not a TypeError', function (string $body) {
+    [$sdk] = recordingSdk([new Response(200, ['Content-Type' => 'application/json'], $body)]);
+
+    $error = caughtApiError(fn () => $sdk->me());
+
+    expect($error)->toBeInstanceOf(ApiException::class)
+        ->and($error->status)->toBe(200)
+        ->and($error->errorCode)->toBe('invalid_response');
+})->with(['a string' => ['"ok"'], 'a number' => ['42'], 'true' => ['true'], 'null' => ['null'], 'not JSON' => ['<html>']]);
