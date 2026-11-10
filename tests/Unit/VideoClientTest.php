@@ -10,7 +10,6 @@ use Fitt\Video\Exceptions\ValidationException;
 use Fitt\Video\Recipe;
 use Fitt\Video\Tests\Support\RecordingClient;
 use Fitt\Video\VideoClient;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -179,7 +178,7 @@ test('verifyWebhook reads a PSR request, and refuses an event id header that is 
 test('with no client the SDK builds Guzzle and its PSR-17 factory', function () {
     $sdk = new VideoClient('https://video.test', 'fvk_x');
 
-    expect((fn () => $this->client)->call($sdk))->toBeInstanceOf(Client::class)
+    expect((fn () => $this->client)->call($sdk))->toBeInstanceOf('GuzzleHttp\Client')
         ->and((fn () => $this->requestFactory)->call($sdk))->toBeInstanceOf(HttpFactory::class);
 });
 
