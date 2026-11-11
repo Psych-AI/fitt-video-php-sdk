@@ -11,7 +11,8 @@ description: >-
   requestAnalysis(), finalise(), deleteSession(), playbackUrl(), frame(),
   receiving webhooks with verifyWebhook() (X-Fitt-Signature,
   X-Fitt-Timestamp, X-Fitt-Event-Id, sequence, object_key,
-  session.checks.completed, video.ready), rotating a webhook secret, and the
+  session.checks.completed, video.ready, webhook.test), rotating a webhook
+  secret in two steps, and the
   error classes (ApiException, AuthenticationException, NotFoundException,
   ValidationException, RateLimitedException, TransportException,
   InvalidWebhookSignature).
@@ -125,9 +126,17 @@ Route::post('fitt/webhook', function (Request $request) {
 - **Keys and secrets.** After you move to a new API key, keep the old key's
   webhook secret beside the new one in `FITT_VIDEO_WEBHOOK_SECRETS` for 24 h:
   sessions made with the old key are still signed with its secret, and the
-  platform stops sending for a revoked key 24 h after the revoke. After a
-  **rotation** of a key's secret, install the new secret at once: the old one
-  never signs again, and deliveries fail and retry until you do.
+  platform stops sending for a revoked key 24 h after the revoke.
+- **Rotating a key's webhook secret** is staged, so no delivery fails. Fitt
+  staff stage a new secret and send it to you. Add it beside the current one
+  in `FITT_VIDEO_WEBHOOK_SECRETS` (comma separated; the verifier accepts
+  either). Tell Fitt it is installed; the platform then promotes it and signs
+  with it from that moment. Then remove the old secret.
+- **A `webhook.test` event may arrive** when Fitt staff press "Send a test
+  event". It is signed like any delivery, with `sequence` 0, no session
+  (`session_id`, `take` and `external_ref` null), empty `tags` and
+  `object_key` null. Verify it, answer 2xx and do nothing else. It is never
+  retried.
 - **The timestamp must be within 300 s of your clock**, either way. Keep the
   server's clock in sync.
 
