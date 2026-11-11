@@ -77,6 +77,10 @@ carries `X-Fitt-Event-Id`, `X-Fitt-Timestamp` and `X-Fitt-Signature`
 attempts (any answer but 2xx, or no answer) are retried 1 min, 5 min, 30 min,
 2 h and 12 h after each failure, then given up.
 
+**Webhook URLs must be https in production.** Outside `local` and `testing`
+the platform refuses an `http` `webhook_url` or space default with a `422`
+`ValidationException`, and never sends to one stored before.
+
 ```php
 // routes/api.php: no session and no CSRF check on this route
 Route::post('fitt/webhook', function (Request $request) {
@@ -139,6 +143,15 @@ Route::post('fitt/webhook', function (Request $request) {
   retried.
 - **The timestamp must be within 300 s of your clock**, either way. Keep the
   server's clock in sync.
+
+## The recording page's Content Security Policy
+
+When the Fitt Video deployment uploads straight to the bucket, the browser
+PUTs segments to the media host (`cloudfront`, for example
+`media.video.fitt.ai`) or to the bucket's host (`s3`, `oss`). A host page with
+a Content Security Policy adds that host to `connect-src`, beside the Fitt
+Video API host, and corporate network allowlists need it too. Playback URLs
+are on the media host as well.
 
 ## Errors
 
