@@ -61,10 +61,25 @@ the `@fitt/video-sdk` integration skill (`video-sdk-integration`).
 | Upload a transcript | `FittVideo::uploadTranscript($id, ['timing' => 'none', 'segments' => [['text' => '...']]])` |
 | Ask for an analysis later | `FittVideo::requestAnalysis($id, 'summarise')` (or `translate`, `meaningful`, `transcribe`, `speech`; pass a take to aim at an older one) |
 | Close it from the server | `FittVideo::finalise($id)` |
+| Let the person review the take | `Recipe::answer()->playbackInStatus()`. **Off by default.** With it, the browser's `session.playback(video)` plays a local copy at once and moves to the processed server file once it is ready. Without it the review stays on the local copy and never switches, and `waitForReady()` rejects `playback_not_enabled`. See "Review right after recording" below |
 | Play it back | `FittVideo::playbackUrl($videoId)` gives `{url, expires_at, mime_type}`; the URL expires, so ask again rather than storing it |
 | A still frame | `FittVideo::frame($videoId, $tMs)` gives the JPEG bytes |
 | Delete | `FittVideo::deleteSession($id)` or `deleteVideo($id)`: the media and the records go |
 | Upload a file | `FittVideo::createVideo([...])` gives `{descriptor, video_id, session}` |
+
+## Review right after recording
+
+The `answer` recipe lets the person watch their take straight after stop (SDK 1.3.0). Two things make it work, one on each side:
+
+1. **Your server turns on status playback** when it creates the session: `Recipe::answer()->playbackInStatus()`. It is off by default in every recipe, so the server never hands the browser a playback URL you did not ask for.
+2. **The page finalises at stop and calls `session.playback(video)`** (or uses `<fitt-recorder review>`).
+
+| `playbackInStatus()` | What the person sees |
+|---|---|
+| On | The local copy at once, then the server file once it is ready (switched only while paused or ended) |
+| Off (the default) | The local copy only. It never switches to the server file. After a reload there is nothing to play |
+
+A retake after finalise is a new session from your server: call `createSession()` again, with `playbackInStatus()` again. The local copy is only allowed for `answer` takes that fit the instance's byte budget (`descriptor.playback.local`); for other recipes the review is the server file, so `playbackInStatus()` is required there.
 
 ## Receive webhooks
 

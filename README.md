@@ -23,7 +23,8 @@ them to `new Fitt\Video\VideoClient(...)`. PHP 8.4.
 use Fitt\Video\Laravel\FittVideo;
 use Fitt\Video\Recipe;
 
-$created = FittVideo::createSession(Recipe::answer()->question('Tell us about a project.')->externalRef('cand-42'));
+// playbackInStatus() lets the page review the take right after stop (off by default)
+$created = FittVideo::createSession(Recipe::answer()->question('Tell us about a project.')->externalRef('cand-42')->playbackInStatus());
 $descriptor = $created['descriptor']; // send only this to the browser
 
 Route::post('fitt/webhook', function (Illuminate\Http\Request $request) {
