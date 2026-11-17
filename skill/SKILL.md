@@ -7,7 +7,9 @@ description: >-
   FITT_VIDEO_KEY, FITT_VIDEO_WEBHOOK_SECRETS, Fitt\Video\VideoClient, the
   FittVideo facade, Recipe::answer() / monitor() / conversation() / file(),
   Recipe::audioOnly() (audio-only answer and conversation, "tracks":
-  ["audio"], 409 no_video on frame()),
+  ["audio"], 409 no_video on frame()), Recipe::signals() / recording() /
+  capture() / enforce() / sessionCap() (the session overrides,
+  Recipe::SIGNAL_GROUPS),
   createSession and the descriptor hand-off, sdkScriptUrl(), session(),
   checks(), transcript(), summary(), analyses(), uploadTranscript(),
   requestAnalysis(), finalise(), deleteSession(), playbackUrl(), frame(),
@@ -70,6 +72,8 @@ the `@fitt/video-sdk` integration skill (`video-sdk-integration`).
 | Delete | `FittVideo::deleteSession($id)` or `deleteVideo($id)`: the media and the records go |
 | Upload a file | `FittVideo::createVideo([...])` gives `{descriptor, video_id, session}` |
 | Record audio only | `Recipe::answer()->audioOnly()` (or `conversation()`); the playable file is the `audio` track |
+| Choose the signals the browser records | `Recipe::conversation()->signals(['attention', 'window', 'fullscreen', 'device', 'net', 'recorder'])` replaces the recipe's default groups; the descriptor then lists exactly those. A name outside `Recipe::SIGNAL_GROUPS` (`attention`, `window`, `screen`, `fullscreen`, `keys`, `clipboard`, `input`, `device`, `net`, `page`, `recorder`) throws `InvalidArgumentException` before any request (1.2.0) |
+| Change timings, capture, rules or the cap | `recording(['max_duration_ms' => 900_000])` (ms, merged over the recipe's), `capture('camera', ['video_bitrate_bps' => 1_500_000])` or `capture('audio', ['audio_channels' => 2])`, `enforce(['stay_on_page' => ['grace_ms' => 5000]])`, `sessionCap(600_000)` (only below the space's cap). The platform checks these: 422 `config_invalid` or `cap_exceeds_space` as a `ValidationException` or `ApiException` with that `errorCode` |
 
 ## Review right after recording
 

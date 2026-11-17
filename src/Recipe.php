@@ -9,6 +9,14 @@ namespace Fitt\Video;
  */
 final class Recipe
 {
+    /**
+     * The signal groups a session may record (spec 6.6). The platform refuses
+     * any other name with 422, so `signals()` refuses it before the request.
+     *
+     * @var list<string>
+     */
+    public const array SIGNAL_GROUPS = ['attention', 'window', 'screen', 'fullscreen', 'keys', 'clipboard', 'input', 'device', 'net', 'page', 'recorder'];
+
     /** @var array<string, mixed> */
     private array $fields;
 
@@ -51,6 +59,73 @@ final class Recipe
         }
 
         return $this->with('tracks', ['audio']);
+    }
+
+    /**
+     * The signal groups the browser records, in place of the recipe's
+     * defaults (`signals.groups`). The descriptor lists exactly these.
+     *
+     * @param  list<string>  $groups  names from SIGNAL_GROUPS
+     *
+     * @throws \InvalidArgumentException on an unknown group
+     */
+    public function signals(array $groups): self
+    {
+        foreach ($groups as $group) {
+            if (! is_string($group) || ! in_array($group, self::SIGNAL_GROUPS, true)) {
+                $shown = is_scalar($group) ? (string) $group : gettype($group);
+                $known = implode(', ', self::SIGNAL_GROUPS);
+
+                throw new \InvalidArgumentException("Unknown signal group '{$shown}'. The groups are: {$known}.");
+            }
+        }
+
+        return $this->with('signals.groups', array_values($groups));
+    }
+
+    /**
+     * Recording timings in milliseconds, merged over the recipe's: `countdown_ms`,
+     * `min_duration_ms`, `max_duration_ms`, `extension_ms`, `warning_before_end_ms`.
+     * The platform refuses an unknown key or a duration above the space's cap
+     * with 422 `config_invalid`.
+     *
+     * @param  array<string, int>  $recording
+     */
+    public function recording(array $recording): self
+    {
+        return $this->with('recording', $recording);
+    }
+
+    /**
+     * Capture settings for one track (`camera` or `audio`), merged over the
+     * recipe's: `width`, `height`, `frame_rate`, `video_bitrate_bps`,
+     * `audio_bitrate_bps`, `audio_channels` (the audio track takes the last two).
+     *
+     * @param  array<string, int>  $settings
+     */
+    public function capture(string $track, array $settings): self
+    {
+        return $this->with("capture.{$track}", $settings);
+    }
+
+    /**
+     * The browser rules the SDK enforces, for example
+     * `['stay_on_page' => ['grace_ms' => 5000]]`.
+     *
+     * @param  array<string, mixed>  $enforce
+     */
+    public function enforce(array $enforce): self
+    {
+        return $this->with('enforce', $enforce);
+    }
+
+    /**
+     * Lower the session cap below the space's (`caps.session_cap_ms`, at least
+     * 1000). A cap above the space's is refused with 422 `cap_exceeds_space`.
+     */
+    public function sessionCap(int $milliseconds): self
+    {
+        return $this->with('caps.session_cap_ms', $milliseconds);
     }
 
     public function question(string $question): self

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0 (2026-11-17)
+
+- Setters for the session overrides `POST /sessions` already accepted, so a
+  host no longer hand-builds the array: `Recipe::signals(array $groups)`
+  (`signals.groups`, the descriptor then lists exactly those groups),
+  `recording(array)`, `capture(string $track, array)`, `enforce(array)` and
+  `sessionCap(int $ms)` (`caps.session_cap_ms`). `signals()` throws
+  `InvalidArgumentException` on a name outside `Recipe::SIGNAL_GROUPS` before
+  any request is made; the other setters leave validation to the platform
+  (422 `config_invalid` or `cap_exceeds_space`).
+
 ## 1.1.0 (2026-11-17)
 
 - `Recipe::audioOnly()` for `answer` and `conversation` (Plan 10): the session

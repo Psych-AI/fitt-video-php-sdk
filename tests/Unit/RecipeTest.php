@@ -43,3 +43,31 @@ test('audioOnly records the audio track alone for answer and conversation, and i
     expect(fn () => Recipe::monitor()->audioOnly())->toThrow(LogicException::class, 'audioOnly() is for the answer and conversation recipes.');
     expect(fn () => Recipe::file()->audioOnly())->toThrow(LogicException::class, 'audioOnly() is for the answer and conversation recipes.');
 });
+
+test('the override setters land where POST /sessions reads them', function () {
+    expect(Recipe::conversation()
+        ->signals(['attention', 'window', 'fullscreen', 'device', 'net', 'recorder'])
+        ->recording(['max_duration_ms' => 900_000])
+        ->capture('camera', ['video_bitrate_bps' => 1_500_000])
+        ->capture('audio', ['audio_channels' => 2])
+        ->enforce(['stay_on_page' => ['grace_ms' => 5000]])
+        ->sessionCap(1_200_000)
+        ->toArray())->toBe([
+            'recipe' => 'conversation',
+            'signals' => ['groups' => ['attention', 'window', 'fullscreen', 'device', 'net', 'recorder']],
+            'recording' => ['max_duration_ms' => 900_000],
+            'capture' => ['camera' => ['video_bitrate_bps' => 1_500_000], 'audio' => ['audio_channels' => 2]],
+            'enforce' => ['stay_on_page' => ['grace_ms' => 5000]],
+            'caps' => ['session_cap_ms' => 1_200_000],
+        ]);
+});
+
+test('signals refuses an unknown group before any request, and keeps a list', function () {
+    expect(fn () => Recipe::answer()->signals(['attention', 'mouse']))
+        ->toThrow(InvalidArgumentException::class, "Unknown signal group 'mouse'.");
+    expect(fn () => Recipe::answer()->signals([['attention']]))
+        ->toThrow(InvalidArgumentException::class, "Unknown signal group 'array'.");
+
+    expect(Recipe::answer()->signals([3 => 'net', 7 => 'page'])->toArray()['signals']['groups'])->toBe(['net', 'page'])
+        ->and(Recipe::answer()->signals([])->toArray()['signals']['groups'])->toBe([]);
+});

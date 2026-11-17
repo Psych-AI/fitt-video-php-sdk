@@ -6,7 +6,7 @@ test('the SDK version matches the version the root composer.json pins for the pa
     $root = json_decode((string) file_get_contents(dirname(__DIR__, 4).'/composer.json'), true, flags: JSON_THROW_ON_ERROR);
     $paths = array_values(array_filter($root['repositories'] ?? [], fn (array $repository) => ($repository['url'] ?? null) === 'packages/php-sdk'));
 
-    expect(Version::VERSION)->toBe('1.1.0')
+    expect(Version::VERSION)->toBe('1.2.0')
         ->and($paths)->toHaveCount(1)
         ->and($paths[0]['type'])->toBe('path')
         ->and($paths[0]['options']['symlink'])->toBeTrue()

@@ -61,6 +61,18 @@ new recipe.
 
   It is for `answer` and `conversation` only: on `monitor` and `file` it
   throws a `LogicException`.
+- The session overrides (1.2.0): `signals($groups)` picks the signal groups
+  the browser records in place of the recipe's defaults (the descriptor lists
+  exactly those); `recording([...])` the timings in milliseconds;
+  `capture('camera', [...])` or `capture('audio', [...])` the bitrates, size
+  and channels; `enforce([...])` the browser rules; `sessionCap($ms)` a cap
+  below the space's. `signals()` throws an `InvalidArgumentException` on a
+  name outside `Recipe::SIGNAL_GROUPS` before any request; the others are
+  checked by the platform (422 `config_invalid`, `cap_exceeds_space`):
+
+  ```php
+  Recipe::conversation()->signals(['attention', 'window', 'fullscreen', 'device', 'net', 'recorder']);
+  ```
 
 ## Frames
 
