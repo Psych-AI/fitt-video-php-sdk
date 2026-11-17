@@ -37,6 +37,22 @@ final class Recipe
         return new self('file');
     }
 
+    /**
+     * Records one audio track and no camera (Plan 10). For `answer` it keeps the
+     * checks and options; for `conversation` the track carries the interviewer
+     * on the right channel.
+     *
+     * @throws \LogicException on monitor and file
+     */
+    public function audioOnly(): self
+    {
+        if (! in_array($this->fields['recipe'], ['answer', 'conversation'], true)) {
+            throw new \LogicException('audioOnly() is for the answer and conversation recipes.');
+        }
+
+        return $this->with('tracks', ['audio']);
+    }
+
     public function question(string $question): self
     {
         return $this->with('context.question', $question);

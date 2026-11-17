@@ -8,12 +8,13 @@ test('the answer recipe of the spec example', function () {
 });
 
 test('every setter lands where POST /sessions reads it', function () {
-    expect(Recipe::conversation()
+    expect(Recipe::conversation()->audioOnly()
         ->question('Q')->speaker('Ann')->context('Night shift lead')->language('af')->outputLanguage('en')
         ->externalRef('cand-7')->tags(['cohort:7'])->metadata(['stage' => 2])->webhookUrl('https://host.test/hooks')
         ->options(['transcribe', 'summarise'])->exposeReason()->rejectOn(['no_speech'])->playbackInStatus(false)
         ->toArray())->toBe([
             'recipe' => 'conversation',
+            'tracks' => ['audio'],
             'context' => ['question' => 'Q', 'speaker_name' => 'Ann', 'context' => 'Night shift lead', 'language' => 'af', 'output_language' => 'en'],
             'external_ref' => 'cand-7',
             'tags' => ['cohort:7'],
@@ -33,4 +34,12 @@ test('each recipe names itself, and a setter returns a new recipe', function () 
         ->and(Recipe::file()->toArray())->toBe(['recipe' => 'file'])
         ->and($base->toArray())->toBe(['recipe' => 'answer'])
         ->and($asked->toArray())->toBe(['recipe' => 'answer', 'context' => ['question' => 'Q']]);
+});
+
+test('audioOnly records the audio track alone for answer and conversation, and is refused for monitor and file', function () {
+    expect(Recipe::answer()->audioOnly()->question('Q')->toArray())->toBe(['recipe' => 'answer', 'tracks' => ['audio'], 'context' => ['question' => 'Q']])
+        ->and(Recipe::conversation()->audioOnly()->toArray())->toBe(['recipe' => 'conversation', 'tracks' => ['audio']]);
+
+    expect(fn () => Recipe::monitor()->audioOnly())->toThrow(LogicException::class, 'audioOnly() is for the answer and conversation recipes.');
+    expect(fn () => Recipe::file()->audioOnly())->toThrow(LogicException::class, 'audioOnly() is for the answer and conversation recipes.');
 });
