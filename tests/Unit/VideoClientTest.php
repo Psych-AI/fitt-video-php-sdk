@@ -51,7 +51,7 @@ test('createSession posts the recipe with the key, as JSON, with the SDK version
         ->and($request->getHeaderLine('Authorization'))->toBe('Bearer fvk_01kfy0a2b3c4d5e6f7g8h9j0km.secret')
         ->and($request->getHeaderLine('Accept'))->toBe('application/json')
         ->and($request->getHeaderLine('Content-Type'))->toBe('application/json')
-        ->and($request->getHeaderLine('User-Agent'))->toBe('fitt-video-php/1.0.0')
+        ->and($request->getHeaderLine('User-Agent'))->toBe('fitt-video-php/1.1.0')
         ->and((string) $request->getBody())->toBe('{"recipe":"answer","context":{"question":"Why?"}}');
 });
 

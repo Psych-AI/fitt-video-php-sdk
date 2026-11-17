@@ -1,8 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 (2026-11-17)
 
-- `Recipe::audioOnly()` for `answer` and `conversation` (Plan 10). The version bump happens on `main` after merge (CLAUDE.md, PHP SDK release steps).
+- `Recipe::audioOnly()` for `answer` and `conversation` (Plan 10): the session
+  records one audio track and no camera (`"tracks": ["audio"]`, 64 kbps, mono for
+  answer and stereo for conversation). It throws `LogicException` on `monitor`
+  and `file`. `frame()` on such a session answers `409 no_video`.
 
 ## 1.0.0 (2026-11-09)
 
