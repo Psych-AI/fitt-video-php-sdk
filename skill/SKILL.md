@@ -6,6 +6,8 @@ description: >-
   fitt/video-sdk: composer require fitt/video-sdk, FITT_VIDEO_URL,
   FITT_VIDEO_KEY, FITT_VIDEO_WEBHOOK_SECRETS, Fitt\Video\VideoClient, the
   FittVideo facade, Recipe::answer() / monitor() / conversation() / file(),
+  Recipe::audioOnly() (audio-only answer and conversation, "tracks":
+  ["audio"], 409 no_video on frame()),
   createSession and the descriptor hand-off, sdkScriptUrl(), session(),
   checks(), transcript(), summary(), analyses(), uploadTranscript(),
   requestAnalysis(), finalise(), deleteSession(), playbackUrl(), frame(),
@@ -66,6 +68,7 @@ the `@fitt/video-sdk` integration skill (`video-sdk-integration`).
 | A still frame | `FittVideo::frame($videoId, $tMs)` gives the JPEG bytes |
 | Delete | `FittVideo::deleteSession($id)` or `deleteVideo($id)`: the media and the records go |
 | Upload a file | `FittVideo::createVideo([...])` gives `{descriptor, video_id, session}` |
+| Record audio only | `Recipe::answer()->audioOnly()` (or `conversation()`); the playable file is the `audio` track |
 
 ## Review right after recording
 
@@ -79,7 +82,16 @@ The `answer` recipe lets the person watch their take straight after stop (SDK 1.
 | On | The local copy at once, then the server file once it is ready (switched only while paused or ended) |
 | Off (the default) | The local copy only. It never switches to the server file. After a reload there is nothing to play |
 
-A retake after finalise is a new session from your server: call `createSession()` again, with `playbackInStatus()` again. The local copy is only allowed for `answer` takes that fit the instance's byte budget (`descriptor.playback.local`); for other recipes the review is the server file, so `playbackInStatus()` is required there.
+A retake after finalise is a new session from your server: call `createSession()` again, with `playbackInStatus()` again. The local copy is only allowed for `answer` and `conversation` takes whose playback track fits the instance's byte budget (`descriptor.playback.local`); for other recipes the review is the server file, so `playbackInStatus()` is required there.
+
+## Audio only
+
+`Recipe::answer()->audioOnly()` (or `Recipe::conversation()->audioOnly()`) sends `"tracks": ["audio"]`: one audio track and no camera, recorded at 64 kbps (mono for answer; stereo for conversation, the candidate left and the interviewer right). On `monitor` and `file` it throws a `LogicException`.
+
+- The audio track is the playable file: `video.ready` names `track: audio`, and `playbackUrl()` on its video id gives an `audio/...` file.
+- An `answer` keeps its checks and options: speech, the verdict, transcribe and meaningful run on that one track. A conversation transcript is a downmix of both speakers.
+- `frame()` on the audio track throws an `ApiException` with `errorCode` `no_video` (409).
+- The browser page changes nothing; it reviews with an `<audio>` element. A smaller take fits the local review budget, so an audio-only conversation can review locally too.
 
 ## Receive webhooks
 

@@ -40,6 +40,28 @@ Route::post('fitt/webhook', function (Illuminate\Http\Request $request) {
 });
 ```
 
+## Recipes
+
+`Recipe::answer()`, `Recipe::monitor()`, `Recipe::conversation()` and
+`Recipe::file()` build the body of `createSession()`. Each setter returns a
+new recipe.
+
+- `audioOnly()` records one audio track and no camera (64 kbps; mono for
+  `answer`, stereo for `conversation`). That track is the playable file and
+  the checks input:
+
+  ```php
+  $client->createSession(Recipe::answer()->audioOnly()->question('Why Fitt?'));
+  ```
+
+  It is for `answer` and `conversation` only: on `monitor` and `file` it
+  throws a `LogicException`.
+
+## Frames
+
+`frame($videoId, $tMs)` gives the JPEG bytes of the camera track at session
+time `$tMs`. An audio track has no frames: the platform answers 409 `no_video`, an `ApiException` with `errorCode` `no_video`.
+
 ## More
 
 The full integration guide, for people and agents, is
