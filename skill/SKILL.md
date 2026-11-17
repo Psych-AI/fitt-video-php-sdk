@@ -33,11 +33,12 @@ the `@fitt/video-sdk` integration skill (`video-sdk-integration`).
 
 ## Install
 
-- `composer require fitt/video-sdk`, from a Composer VCS repository. The
-  read-only repository `Psych-AI/fitt-video-php-sdk` does not exist yet (it
-  comes with the platform's deployment plan). Until then, install from a path
-  repository or a VCS repository that points at a copy of the platform's
-  `packages/php-sdk`.
+- `composer require fitt/video-sdk`. The package is on Packagist
+  (`packagist.org/packages/fitt/video-sdk`, since 1.0.0 on 2026-11-17), so a
+  host needs no `repositories` entry. Its source is the public read-only
+  repository `Psych-AI/fitt-video-php-sdk`, split from the platform's
+  `packages/php-sdk` on each `php-sdk-v*` tag; a host that must pin an
+  unreleased commit can add that repository as a VCS source, never a fork.
 - It needs a PSR-18 client and PSR-17 factories. With `guzzlehttp/guzzle`
   installed it builds one itself (30 s request, 10 s connect timeout).
 - In Laravel the provider and the `FittVideo` facade are discovered. Set:

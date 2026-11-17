@@ -12,6 +12,11 @@ and PSR-17; a thin Laravel layer adds a config file and the `FittVideo` facade.
 composer require fitt/video-sdk
 ```
 
+The package is on Packagist (<https://packagist.org/packages/fitt/video-sdk>), so no
+`repositories` entry is needed. Its source is the read-only repository
+<https://github.com/Psych-AI/fitt-video-php-sdk>, split from the platform's `packages/php-sdk`
+on each release; changes and issues belong in the platform repository.
+
 Set `FITT_VIDEO_URL` (the platform's origin), `FITT_VIDEO_KEY` (the space's
 API key, server only) and `FITT_VIDEO_WEBHOOK_SECRETS` (the key's webhook
 secret, comma separated while a key change overlaps). Outside Laravel, pass
